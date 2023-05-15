@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>booaker</title>
+    </head>
+    <body>
+        <h1>Mail book marklet maker</h1>
+        use "${priority}" key = word to change the place for incident priority<br>
+
+        like vise<br>
+
+        ${incidentNumber} = incident Id<br>
+        ${assignedTo} = whom the ticket Assigned to <br>
+        ${assignedToFirstName} =  first name of whom we assigned the ticket to<br>
+        ${checked} = whom you check with (first name only) <br>
+        ${medium} = medium by with you checked the ticket<br>
+
+        <textarea name="bodyfornormal" id="bodyfornormal"></textarea>
+        <textarea name="bodyfornotchecked" id="bodyfornotchecked"></textarea>
+
+          <button onclick="main();">Generate Bookmarklet</button>
+        <textarea name="codeOutput" id="codeOutput"></textarea>
+
+<b>Bookmaklet: </b><a id="bookmarklet-a" class="bookmarklet" href="">bookmarklet</a><
+<b>Html output</b><textarea id="htmlOuput-textarea" class="output-textarea"></textarea><
+
+    </body>
+    <script charset="utf-8">
+   
+
+        function init(){
+            var bodyForNormalString=`Hi \${assignedToFirstName},
+    Greetings, As discussed with \${checked} through \${medium}, the above mentioned \${priority} case has been assigned to you.
+Kindly take care.
+
+Thanks and Regards
+Vaisakh K M 
+AMS Global Triage Desk
+`
+
+            var bodyForNotCheckedString=`Hi \${assignedToFirstName},
+    Greetings, As unable to reach you, the above mentioned \${priority} case has been assigned to you.
+Kindly take care.
+
+Thanks and Regards
+Vaisakh K M 
+AMS Global Triage Desk
+`
+
+       document.getElementById("bodyfornormal").value= bodyForNormalString;
+       document.getElementById("bodyfornotchecked").value= bodyForNotCheckedString;
+ 
+        } 
+
+        init();
+
+
+
+function mainbookmark(){
+var prio = window.frames["gsft_main"].document.getElementById("incident.priority");
+var priority = prio.options[prio.selectedIndex].text.split(" ")[2];
+var incidentNumber = window.frames["gsft_main"].document.getElementById("sys_readonly.incident.number").value;
+var subject =  priority +" case %2D "+incidentNumber;
+var cc = "1MerCTDm@NorthAmerica.msx.merck.com";
+
+
+var assignedTo = window.frames["gsft_main"].document.getElementById("sys_display.incident.assigned_to").value;  
+var mailTo = assignedTo;
+var assignedToFirstName = assignedTo.split(' ')[0];
+
+var inp = prompt('Enter NAME of person ACKNOWLEDGED and MODE of\ncommunication seperatied by comma(IM/Call)\n\neg: name, IM\n\nleave as blank if NOT acknowledged',",IM");
+
+var checked = inp.split(',')[0];
+var medium=inp.split(',')[1];
+
+if(inp===""){
+    var bodyText = bodyForNotCheckedStringReplace;
+}else{
+    var bodyText = bodyForNormalStringReplace;
+}
+
+var a = `mailto:${mailTo}?subject=${subject}&body=${bodyText}&cc=${cc}`;
+window.open(a);
+
+}
+
+
+function main(){
+console.log("hi")
+    var bodyfornormalrp = encodeURIComponent(document.getElementById("bodyfornormal").value).replaceAll("%24%7B","\${").replaceAll("%7D","}")
+    var bodyfornotcheckedrp = encodeURIComponent(document.getElementById("bodyfornotchecked").value).replaceAll("%24%7B","\${").replaceAll("%7D","}")
+    var mainbookmarkstring=mainbookmark.toString();
+    var k=mainbookmarkstring.replaceAll("bodyForNormalStringReplace","`"+bodyfornormalrp+"`").replaceAll("bodyForNotCheckedStringReplace","`"+bodyfornotcheckedrp+"`")+"mainbookmark();";
+    generateBookmarklet(k)
+console.log(k);
+}
+
+        function cleanCode(code){
+           return code.trim()
+         }
+
+        function generateBookmarklet (code){
+           var title = "automailer"; 
+           var link  = document.getElementById("bookmarklet-a");
+           var codeOutput = document.getElementById("codeOutput");
+           var htmlOuput  = document.getElementById("htmlOuput-textarea");
+
+           var output = "javascript:" +  encodeURIComponent("(function(){" + cleanCode(code) +  "})();");
+
+           link.text = title;
+           link.href = output;
+           codeOutput.value = output;
+
+           htmlOuput.value = "<a href=\"" + output + "\">" + title + "</a>"
+         }
+
+        </script>
+
+
+    <!-- refernce:https://github.com/caiorss/bookmarklet-maker-->
+</html>
